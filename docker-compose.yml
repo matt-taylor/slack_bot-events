@@ -1,0 +1,14 @@
+services:
+  slack_bot-events:
+    command: tail -f /dev/null
+    env_file: .env
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - .:/gem
+      - ..:/local
+      - bundle-cache:/usr/local/bundle:delegated
+
+volumes:
+  bundle-cache:
