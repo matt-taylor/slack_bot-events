@@ -48,6 +48,8 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.1)
+    rspec_junit_formatter (0.6.0)
+      rspec-core (>= 2, < 4, != 2.12.0)
     simplecov (0.17.1)
       docile (~> 1.1)
       json (>= 1.8, < 3)
@@ -65,7 +67,8 @@ PLATFORMS
 DEPENDENCIES
   pry-byebug
   rspec (~> 3.0)
-  simplecov (~> 0.17.0)
+  rspec_junit_formatter
+  simplecov
   slack_bot-events!
 
 BUNDLED WITH
