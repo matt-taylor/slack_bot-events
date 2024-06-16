@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.description = "Describe the gem here"
   spec.homepage    = "https://github.com/matt-taylor/slack_bot-events"
 
-  spec.required_ruby_version = Gem::Requirement.new(">= 3.2")
+  spec.required_ruby_version = Gem::Requirement.new(">= 3.1")
 
   spec.metadata = {
     "github_repo" => spec.homepage,
