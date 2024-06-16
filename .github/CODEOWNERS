@@ -1,19 +1,1 @@
-# Replace your individual username with your Github team (@1debit/<team-name>)
-# once you are done with the initial setup of the gem
 * @matttaylor
-
-# Code Quality
-.rubocop.yml      @matttaylor @1debit/ruby-code-quality
-.rubocop_todo.yml @matttaylor @1debit/ruby-code-quality
-
-# Co-ownership of build related configuration files with the build-config-maintainers team
-.circleci/          @matttaylor @1debit/build-config-maintainers
-.github/            @matttaylor @1debit/build-config-maintainers
-.codeclimate.yml    @matttaylor @1debit/build-config-maintainers
-.ruby-version       @matttaylor @1debit/build-config-maintainers
-docker-compose.yml  @matttaylor @1debit/build-config-maintainers
-Dockerfile          @matttaylor @1debit/build-config-maintainers
-Makefile            @matttaylor @1debit/build-config-maintainers
-
-# Let anyone update, incl. bots (e.g. for Dependabot PR auto-merging)
-Gemfile.lock
