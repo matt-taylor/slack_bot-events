@@ -23,6 +23,10 @@ module SlackBot
             item.channel
           end
 
+          def message_ts
+            item.ts
+          end
+
           def tldr
             "type: #{type}; channel:#{channel}; reaction:#{reaction}"
           end

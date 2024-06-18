@@ -29,12 +29,16 @@ module SlackBot
       raise Error, "Expected configuration to be a SlackBot::Events::Configuration"
     end
 
-    def self.register_listener(name:, handler:)
-      config.register_listener(name: name, handler: handler)
+    def self.register_listener(name:, handler:, on_success: nil, on_failure: nil)
+      config.register_listener(name: name, handler: handler, on_success: on_success, on_failure: on_failure)
     end
 
     def self.remove_listener(name:)
       config.remove_listener(name: name)
+    end
+
+    def self.logger
+      config.logger
     end
   end
 end
