@@ -22,7 +22,17 @@ module SlackBot
               case parsed_data["type"]
               when "events_api"
                 events_api(parsed_data)
-              else "hello"
+              when "app_rate_limited"
+                # https://api.slack.com/apis/rate-limits#events
+                # Total allowed workspace events are 30,000 per hour
+                # This message type is received once you have gone beyond that
+                params = {
+                  minute_rate_limited: parsed_data["minute_rate_limited"],
+                  team_id: parsed_data["team_id"],
+                  api_app_id: parsed_data["api_app_id"],
+                }
+                event_tracer("message:app_rate_limited", **params)
+              when "hello"
                 params = {
                   num_connections: parsed_data["num_connections"],
                   debug_info_host: parsed_data["debug_info"]["host"],
@@ -57,7 +67,7 @@ module SlackBot
           start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           yield
           elapsed_time = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time
-          Events.logger.info "[Event completed] [#{elapsed_time.round(2)}s] #{type} #{stringify}"
+          Events.logger.info "[Event completed] [#{elapsed_time.round(3)}s] #{type} #{stringify}"
         end
       end
 
