@@ -2,20 +2,37 @@
 
 require "slack_bot/events/middleware/event_tracer"
 
+####################
+#
+# Adapted from Sidekiq:
+# https://github.com/sidekiq/sidekiq/blob/main/lib/sidekiq/middleware/chain.rb
+#
+####################
+
 module SlackBot
   module Events
     module Middleware
       class Chain
         include Enumerable
 
-        def self.default_entry
-          [
-            Entry.new(Middleware::EventTracer),
-          ]
+        attr_reader :type
+
+        DEFAULT_ENTRIES = {
+          message: [Middleware::EventTracer],
+          open: [Middleware::EventTracer],
+          close: [Middleware::EventTracer],
+        }
+
+        def initialize(type:)
+          @type = type
+        end
+
+        def self.default_entry(type)
+          DEFAULT_ENTRIES[type].map { Entry.new(_1) }
         end
 
         def entries
-          @entries ||= self.class.default_entry
+          @entries ||= self.class.default_entry(type)
         end
 
         def remove(klass)
@@ -76,7 +93,13 @@ module SlackBot
             if chain.empty?
               yield(yield: schema, parsed_data: parsed_data)
             else
-              chain.shift.call(type: type, socket_event: socket_event, schema: schema, parsed_data: parsed_data, &traverse_chain)
+              params = {
+                parsed_data: parsed_data,
+                schema: schema,
+                socket_event: socket_event,
+                type: type,
+              }
+              chain.shift.call(**params, &traverse_chain)
             end
           end
           traverse_chain.call
