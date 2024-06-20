@@ -39,7 +39,7 @@ module SlackBot
           end
 
           def tldr
-            "type: #{type}; channel:#{channel}; raw_text:#{text}"
+            "type:#{type}; user:#{user}; channel:#{channel}; ts_id:#{combined_id}"
           end
 
           def thread_ts
@@ -51,6 +51,10 @@ module SlackBot
           end
 
           private
+
+          def combined_id
+            thread_ts ? "#{ts}:#{thread_ts}" : ts
+          end
 
           def return_nil?(val)
             JsonSchematize::EmptyValue === val || val.nil?
