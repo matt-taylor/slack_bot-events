@@ -26,6 +26,12 @@ module SlackBot
       add_composer :close_middleware, allowed: Middleware::Chain, default: Middleware::Chain.new(type: :close)
       add_composer :envelope_acknowledge, allowed: Symbol, default: DEFAULT_ACKNOWLEDGE, validator: ->(val) { ALLOWED_ACKNOWLEDGE.include?(val) }, invalid_message: ->(_) { "Must by a Symbol in #{ALLOWED_ACKNOWLEDGE}" }
 
+      ALLOWED_ACKNOWLEDGE.each do |ack|
+        define_method :"acknowledge_#{ack}?" do
+          envelope_acknowledge == ack
+        end
+      end
+
       def register_listener(name:, handler:, on_success: nil, on_failure: nil)
         if event_handler = listeners[name.to_sym]
           logger.warn "`#{name}` already exists as listener event. Reseting with new input"
