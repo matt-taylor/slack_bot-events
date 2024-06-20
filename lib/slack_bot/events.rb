@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
+require "pry"
+
 require "slack_bot/events/configuration"
 require "slack_bot/events/client"
+require "slack_bot/events/middleware/chain"
 require "slack_bot/events/schemas/socket_payload"
 
 module SlackBot
@@ -39,6 +42,18 @@ module SlackBot
 
     def self.logger
       config.logger
+    end
+
+    def self.message_middleware
+      config.message_middleware
+    end
+
+    def self.open_middleware
+      config.open_middleware
+    end
+
+    def self.close_middleware
+      config.close_middleware
     end
   end
 end

@@ -3,7 +3,7 @@
 require "eventmachine"
 require "faraday"
 require "faye/websocket"
-require "pry"
+require "slack_bot/events/schematize"
 
 module SlackBot
   module Events
@@ -11,64 +11,54 @@ module SlackBot
       BASE_API = "https://slack.com/api"
 
       def start!
-        EM.run do
-           websocket.on :open do |event|
-            event_tracer(:open)
+        EventMachine.run do
+           websocket.on :open do |socket_event|
+            process(type: :open, socket_event: socket_event) { |**| }
           end
 
-          websocket.on :message do |event|
-            event_tracer(:message) do
-              parsed_data = JSON.parse(event.data)
+          websocket.on :message do |socket_event|
+            process_message(socket_event: socket_event) do |parsed_data:, schema: nil|
               case parsed_data["type"]
               when "events_api"
-                events_api(parsed_data)
-              when "app_rate_limited"
-                # https://api.slack.com/apis/rate-limits#events
-                # Total allowed workspace events are 30,000 per hour
-                # This message type is received once you have gone beyond that
-                params = {
-                  minute_rate_limited: parsed_data["minute_rate_limited"],
-                  team_id: parsed_data["team_id"],
-                  api_app_id: parsed_data["api_app_id"],
-                }
-                event_tracer("message:app_rate_limited", **params)
-              when "hello"
-                params = {
-                  num_connections: parsed_data["num_connections"],
-                  debug_info_host: parsed_data["debug_info"]["host"],
-                  debug_info_connect_time: parsed_data["debug_info"]["approximate_connection_time"],
-                }
-                event_tracer("message:hello", **params)
+                events_api(schema: schema, parsed_data: parsed_data)
               end
             end
           end
 
-          websocket.on :close do |event|
-            event_tracer(:close, code: event.code, reason: event.reason)
+          websocket.on :close do |socket_event|
+            process(type: :close, socket_event: socket_event) { |**| }
             @websocket = nil
+
+            # The websocket is closed, explcitly stop the event machine to to end the loop and return to the parent
+            EventMachine.stop
           end
         end
       end
 
-      def events_api(parsed_data)
-        schematized = SlackBot::Events::Schemas::SocketPayload.new(parsed_data)
-        Events.logger.info(schematized.tldr) if Events.config.print_tldr
-        object = Events.config.listeners[schematized.type.to_sym]
-        if object
-          safe_handler(type: schematized.type.to_sym, object: object, schema: schematized, parsed_data: parsed_data)
+      def process_message(socket_event:)
+        schema_data = Schematize.call(data: socket_event.data)
+        SlackBot::Events.message_middleware.invoke_message(type: :message, socket_event: socket_event, **schema_data) do
+          yield(**schema_data) if block_given?
         end
-        websocket.send("#{{ envelope_id: schematized.envelope_id }.to_json}")
       end
 
-      def event_tracer(type, **params)
-        stringify = params.map { |k,v| "#{k}:#{v}" }.join("; ")
-        Events.logger.info "[Event Received] #{type} #{stringify}"
-        if block_given?
-          start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-          yield
-          elapsed_time = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time
-          Events.logger.info "[Event completed] [#{elapsed_time.round(3)}s] #{type} #{stringify}"
+      def process(type:, socket_event:)
+        SlackBot::Events.public_send(:"#{type}_middleware").invoke(type: type, socket_event: socket_event) do
+          yield if block_given?
         end
+      end
+
+      def events_api(schema:, parsed_data:)
+        if Events.config.print_tldr
+          Events.logger.info { schema.tldr }
+        end
+
+        object = Events.config.listeners[schema.type.to_sym]
+        if object
+          safe_handler(type: schema.type.to_sym, object: object, schema: schema, parsed_data: parsed_data)
+        end
+
+        websocket.send("#{{ envelope_id: schema.envelope_id }.to_json}")
       end
 
       private

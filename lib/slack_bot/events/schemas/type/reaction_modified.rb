@@ -28,7 +28,7 @@ module SlackBot
           end
 
           def tldr
-            "type: #{type}; channel:#{channel}; reaction:#{reaction}"
+            "type:#{type}; user:#{item_user}; channel:#{channel}; reaction:#{reaction}"
           end
         end
       end

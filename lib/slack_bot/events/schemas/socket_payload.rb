@@ -28,7 +28,7 @@ module SlackBot
         def tldr
           retry_language = "#{retry_attempt}"
           retry_language += ":#{retry_reason}" if retry_attempt > 0
-          "tldr:#{payload.event.tldr}; retry:#{retry_language}"
+          "#{payload.event.tldr}; retry:#{retry_language}"
         end
       end
     end
