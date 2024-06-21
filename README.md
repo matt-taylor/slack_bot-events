@@ -25,10 +25,15 @@ SlackBot::Events.configure do |config|
   config.print_tldr = true
 
   # By default, SlackBot::Events will acknowledge at the end of the middleware chain after it passes the message to the event listener. Available options:
+  # => on_complete: Acknowledge after listener has completed on failure and on success
   # => on_success: Acknowledge only on succesful listener events (Use with caution)
   # => on_receive: Acknowledge at the beginning of the middleware chain before it gets to listener events
   # Default value: :on_complete
   config.envelope_acknowledge = :on_complete
+
+  # By default, this gem outputs to STDOUT. You can set your own logger ot set it to the Rails logger if desired
+  # Default value: Logger.new(STDOUT)
+  config.logger = Rails.logger
 end
 ```
 
