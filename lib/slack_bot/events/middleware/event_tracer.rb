@@ -11,21 +11,23 @@ module SlackBot
           when :close
             additional_info = "code: #{socket_event.code} reason:#{socket_event.reason}"
           when :message
-            accurate_type = parsed_data.dig("payload","event","subtype") || parsed_data.dig("payload","event","type")
-            p_type = [
-              parsed_data.dig("type"),
-              accurate_type
-            ].compact.join(":")
-            case p_type
+
+            case parsed_data.dig("type")
             when "app_rate_limited"
               # https://api.slack.com/apis/rate-limits#events
               # Total allowed workspace events are 30,000 per hour
               # This message type is received once you have gone beyond that
-              temp_type += ":#{p_type}"
+              temp_type += ":#{parsed_data.dig("type")}"
               additional_info = "minute_rate_limited:#{parsed_data["minute_rate_limited"]} " \
                 "team_id:#{parsed_data["team_id"]} " \
                 "api_app_id:#{parsed_data["api_app_id"]}"
             else
+              accurate_type = parsed_data.dig("payload","event","subtype") || parsed_data.dig("payload","event","type")
+              p_type = [
+                parsed_data.dig("type"),
+                accurate_type
+              ].compact.join(":")
+
               # Expected other types are `events_api` and `hello`
               temp_type += ":#{p_type}"
             end
