@@ -40,7 +40,6 @@ module SlackBot
 
         def acknowledge!(websocket:, schema:)
           return if schema.nil?
-          return
 
           websocket.send("#{{ envelope_id: schema.envelope_id }.to_json}")
           Events.logger.debug { "Envelope acknowledgment completed [#{SlackBot::Events.config.envelope_acknowledge}]" }
