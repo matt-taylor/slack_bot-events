@@ -20,7 +20,7 @@ module SlackBot
           puts error.message
           puts error.backtrace
           Events.logger.error do
-            "#{listener[:handler]} returned #{error.class} => #{error.message}. #{error.backtrace[0...10]}")
+            "#{listener[:handler]} returned #{error.class} => #{error.message}. #{error.backtrace[0...10]}"
           end
 
           begin
