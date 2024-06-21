@@ -52,7 +52,7 @@ module SlackBot
       end
 
       def events_api(handler:, schema:, parsed_data:)
-        return if listener.nil?
+        return if handler.nil?
 
         Events.logger.info { schema.tldr } if Events.config.print_tldr
 
