@@ -19,9 +19,12 @@ module SlackBot
         attr_reader :type
 
         DEFAULT_ENTRIES = {
-          message: [Middleware::EventTracer, Middleware::MessageHandler],
-          open: [Middleware::EventTracer],
-          close: [Middleware::EventTracer],
+          message: {
+            base: [Middleware::EventTracer, Middleware::MessageHandler],
+            immutable: [Middleware::MessageHandler]
+          },
+          open: { base: [Middleware::EventTracer] },
+          close: { base: [Middleware::EventTracer] },
         }
 
         def initialize(type:)
@@ -29,7 +32,7 @@ module SlackBot
         end
 
         def self.default_entry(type)
-          DEFAULT_ENTRIES[type].map { Entry.new(_1) }
+          DEFAULT_ENTRIES[type][:base].map { Entry.new(_1) }
         end
 
         def entries
@@ -37,7 +40,7 @@ module SlackBot
         end
 
         def remove(klass)
-          raise ArgumentError, "Unable to remove default Middleware #{klass}" if self.class.default_entry.map(:klass).include?(klass)
+          raise ArgumentError, "Unable to remove default Middleware #{klass}" if Array(DEFAULT_ENTRIES[@type][:immutable]).include?(klass)
 
           entries.delete_if { |entry| entry.klass == klass }
         end
