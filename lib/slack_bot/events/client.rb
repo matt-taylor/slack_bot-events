@@ -20,7 +20,7 @@ module SlackBot
             process_message(socket_event: socket_event) do |listener:, parsed_data:, schema: nil|
               case parsed_data["type"]
               when "events_api"
-                events_api(handler: listener[:handler], schema: schema, parsed_data: parsed_data)
+                events_api(handler: listener&.dig(:handler), schema: schema, parsed_data: parsed_data)
               end
             end
           end
