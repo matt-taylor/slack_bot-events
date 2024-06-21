@@ -15,11 +15,7 @@ module SlackBot
         :on_receive,
       ]
 
-      add_composer :client_id, allowed: String, default: ENV["SLACK_CLIENT_ID"]
-      add_composer :client_secret, allowed: String, default: ENV["SLACK_CLIENT_SECRET"]
-      add_composer :client_signing_secret, allowed: String, default: ENV["SLACK_SIGNING_SECRET"]
       add_composer :client_socket_token, allowed: String, default: ENV["SLACK_SOCKET_TOKEN"]
-      add_composer :client_verification_token, allowed: String, default: ENV["SLACK_VERIFICATION_TOKEN"]
       add_composer :print_tldr, allowed: [true.class, false.class], default: true
       add_composer :message_middleware, allowed: Middleware::Chain, default: Middleware::Chain.new(type: :message)
       add_composer :open_middleware, allowed: Middleware::Chain, default: Middleware::Chain.new(type: :open)
