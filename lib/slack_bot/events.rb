@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "pry"
-
 require "slack_bot/events/configuration"
 require "slack_bot/events/client"
 require "slack_bot/events/middleware/chain"
