@@ -4,14 +4,18 @@ module SlackBot
   module Events
     module Middleware
       class EventTracer
-        def call(type:, socket_event:, schema: nil, parsed_data: nil)
+        def call(type:, socket_event:, schema: nil, parsed_data: nil, **params)
           start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           temp_type = type.dup.to_s
           case type
           when :close
             additional_info = "code: #{socket_event.code} reason:#{socket_event.reason}"
           when :message
-            p_type = parsed_data.dig("type")
+            accurate_type = parsed_data.dig("payload","event","subtype") || parsed_data.dig("payload","event","type")
+            p_type = [
+              parsed_data.dig("type"),
+              accurate_type
+            ].compact.join(":")
             case p_type
             when "app_rate_limited"
               # https://api.slack.com/apis/rate-limits#events
@@ -32,7 +36,7 @@ module SlackBot
           yield
 
           elapsed_time = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time
-          Events.logger.info { "[Event Finished] [#{(elapsed_time * 1000).round(2)}ms] #{temp_type}" }
+          Events.logger.info { "[Event Finished] #{temp_type} [#{(elapsed_time * 1000).round(2)}ms]" }
         end
       end
     end

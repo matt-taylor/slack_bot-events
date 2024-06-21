@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "slack_bot/events/middleware/event_tracer"
+require "slack_bot/events/middleware/message_handler"
 
 ####################
 #
@@ -18,7 +19,7 @@ module SlackBot
         attr_reader :type
 
         DEFAULT_ENTRIES = {
-          message: [Middleware::EventTracer],
+          message: [Middleware::EventTracer, Middleware::MessageHandler],
           open: [Middleware::EventTracer],
           close: [Middleware::EventTracer],
         }
@@ -85,19 +86,21 @@ module SlackBot
           @entries = nil
         end
 
-        def invoke_message(type:, socket_event:, parsed_data:, schema: nil)
+        def invoke_message(type:, socket_event:, parsed_data:, websocket:, listener:, schema: nil)
           return yield if empty?
 
           chain = retrieve
           traverse_chain = proc do
             if chain.empty?
-              yield(yield: schema, parsed_data: parsed_data)
+              yield
             else
               params = {
                 parsed_data: parsed_data,
                 schema: schema,
                 socket_event: socket_event,
+                listener: listener,
                 type: type,
+                websocket: websocket,
               }
               chain.shift.call(**params, &traverse_chain)
             end
