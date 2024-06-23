@@ -1,9 +1,17 @@
-# SlackBot::Events
+# SlackBot Events
 
-Zappier is a workflow engine that you have to pay for. Welcome to SlackBot::Events, a free alternative to Zappier.
+Welcome to SlackBot Events Gem! This gem provides a seamless way to hook into your paid Slack Workspace's Events API and run complex or simple automation. You can run automations based on events like: Message Deleted, Reactions Added, Reactions Removed, Message sent to channel, Message sent to Thread, User added to Channel, and so many more. [View Full list of Events Here](https://api.slack.com/events).
 
-SlackBot::Events allows you to listen to events from your paid Slack workspace and run automated code based on real time events. You can run automations based on events like: Message Deleted, Reactions Added, Reactions Removed, Message sent to channel, Message sent to Thread, User added to Channel, and so many more. [View Full list of Events Here](https://api.slack.com/events)
+SlackBot Events provides the foundational tooling to run a SlackBot, automate Jira tickets based on Events, Customize and Automate AI responses to messages, Automate tagging relavant groups in threads, track time to respond and time to resolve threads, and so much more.
 
+SlackBot Events Gem connects directly into your paid Slack workspace by utilizing websockets. Websockets provides a resilient, safe, and reliable connection to retreive events without the need to expose a public endpoint for Slack Events.
+
+
+## SlackBot Events inspiration
+
+There already exists No to Low code Slack workflow Engines like Zappier. However, these workflows are often slow and buggy. They cost money based on usage. Additionally, creating complex workflows with low code is a bit messy.
+
+SlackBot Events provides a free alternative to exposing events from your paid Slack Workspace.
 
 ## Configuration
 
