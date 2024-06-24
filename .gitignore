@@ -18,3 +18,7 @@
 # generated gems
 *.gem
 .env
+
+# Example Gemfiles
+/examples/**/Gemfile.lock
+
