@@ -6,6 +6,14 @@ SlackBot Events provides the foundational tooling to run a SlackBot, automate Ji
 
 SlackBot Events Gem connects directly into your paid Slack workspace by utilizing websockets. Websockets provides a resilient, safe, and reliable connection to retreive events without the need to expose a public endpoint for Slack Events.
 
+## Installation
+
+```ruby
+source 'http://rubygems.org'
+gem 'slack_bot-events'
+```
+
+[Example Use Cases](/examples)
 
 ## SlackBot Events inspiration
 
@@ -48,29 +56,45 @@ end
 ### Event Listeners:
 Event Listeners is where the configurable power comes in. Listeners are custom code that gets run on specific event_api actions as defined in [Slack Event Types](https://api.slack.com/events).
 
-There can be at most configured listener listeing to any given event type.
+There can be at most 1 configured listener listeing to any given event type.
 
 To Register a new listener:
 ```ruby
 SlackBot::Events.register_listener(name: "event_type_name", handler: handler_object)
 SlackBot::Events.register_listener(name: "event_type_name_2", handler: handler_object2, on_success: on_success_proc)
 SlackBot::Events.register_listener(name: "event_type_name_3", handler: handler_object3, on_failure: on_failure_proc)
+
+### Or via the config
+
+SlackBot::Events.configure do |c|
+  c.register_listener(name: "event_type_name4", handler: handler_object4)
+end
+
 ```
 
 #### Handler
 The Handler argument must be an object that responds to `call` with KWargs `schema` and `raw_data`.
 
-#### On Failure
+#### On Failure (Optional Argument)
 The `on_failure` argument must be an object that resoonds to `call` with 2 arguments. The first argument will be the converted schema if available. The second argument will be the error that caused the Handler to fail
 
-#### On Success
+#### On Success (Optional Argument)
 The `on_success` argument must be an object that resoonds to `call` with 1 argument. The argument will be the converted schema if available.
 
 [Example with Basic Listeners](/examples/basic)
 
 [Example with Multiple Listeners](/examples/multi_listener)
 
-## Installation
+## Middleware
+
+Middlewares can help add additional observability into a unit of work. For the Websocket message type, you can add any number of middlewars via the Configure block.
+
+
+```ruby
+SlackBot::Events.configure do |c|
+  c.message_middleware.add(DataDogObeservabilityMiddleware)
+end
+```
 
 ## Known Restrictions
 ### Limited number of events per hour per workspace

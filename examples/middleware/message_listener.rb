@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module MessageListener
-
   def self.call(schema:, raw_data:)
     # Do some cool(quick returning) things here
     # schema.payload.event will be a SlackBot::Events::Schemas::Type::Message
